@@ -2,6 +2,7 @@ package com.juliomesquita.in_memory_database.infra.repositories;
 
 import com.juliomesquita.in_memory_database.domain.entities.User;
 import com.juliomesquita.in_memory_database.domain.interfaces.UserRepository;
+import com.juliomesquita.in_memory_database.domain.utils.PageableGeneric;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -37,6 +38,27 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Collection<User> findAll() {
         return this.tb_Users.values();
+    }
+
+    @Override
+    public PageableGeneric findAllPageable(Integer page, Integer perPage) {
+        int totalElements = this.tb_Users.size();
+        int elementInitial = 0;
+        if ((page * perPage) > 0) {
+            elementInitial = (page * perPage) - 1;
+        }
+        List<User> listUsers = this.tb_Users.values().stream()
+                .skip(elementInitial)
+                .limit(perPage)
+                .toList();
+
+        return PageableGeneric.builder()
+                .object(listUsers)
+                .page(page)
+                .perPage(perPage)
+                .totalPages(totalElements / perPage)
+                .total((long) totalElements)
+                .build();
     }
 
     @Override

@@ -20,19 +20,22 @@ public class UserController {
     private final FindByEmailUser findByEmailUser;
     private final FindAllUser findAllUser;
     private final DeleteUser deleteUser;
+    private final FindAllPageableUser findAllPageableUser;
 
     public UserController(
             final CreateUser createUser,
             final FindByIdUser findByIdUser,
             final FindByEmailUser findByEmailUser,
             final FindAllUser findAllUser,
-            final DeleteUser deleteUser
+            final DeleteUser deleteUser,
+            final FindAllPageableUser findAllPageableUser
     ) {
         this.createUser = Objects.requireNonNull(createUser);
         this.findByIdUser = Objects.requireNonNull(findByIdUser);
         this.findByEmailUser = Objects.requireNonNull(findByEmailUser);
         this.findAllUser = Objects.requireNonNull(findAllUser);
         this.deleteUser = Objects.requireNonNull(deleteUser);
+        this.findAllPageableUser = Objects.requireNonNull(findAllPageableUser);
     }
 
     @PostMapping
@@ -72,6 +75,20 @@ public class UserController {
         try {
             List<FindAllUser.Output> response = this.findAllUser.execute();
             return ResponseEntity.ok(response.stream().map(UserResponse::new).toList());
+        } catch (Throwable t) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/list")
+    public ResponseEntity<?> findAllPageable(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "perPage", required = false, defaultValue = "20") Integer perPage
+
+    ) {
+        try {
+            FindAllPageableUser.Output response = this.findAllPageableUser.execute(new FindAllPageableUser.Input(page, perPage));
+            return ResponseEntity.ok(response);
         } catch (Throwable t) {
             return ResponseEntity.notFound().build();
         }

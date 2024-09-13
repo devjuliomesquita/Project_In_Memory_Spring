@@ -38,4 +38,9 @@ public class BeansConfig {
     public DeleteUser deleteUser(){
         return new DeleteUser(userRepository);
     }
+
+    @Bean
+    public FindAllPageableUser findAllPageableUser(){
+        return new FindAllPageableUser(userRepository);
+    }
 }
